@@ -3,17 +3,19 @@ Prioridade: 🔴 Alta | Dependências: Feature 1
 
 ### 📝 Histórias de Usuário
 
-- HU-07: Como usuário, quero iniciar um treino baseado em uma ficha
+- HU-07: Como usuário, quero iniciar um treino baseado em uma ficha (sheet)
 - HU-08: Como usuário, quero visualizar a sequência de exercícios
 - HU-09: Como usuário, quero marcar séries como concluídas
 - HU-10: Como usuário, quero ver o temporizador de descanso
 - HU-11: Como usuário, quero ouvir alarme ao fim do descanso
-- HU-12: Como usuário, quero pular exercícios durante o treino
+- HU-12: Como usuário, quero poder pular exercícios durante o treino
 - HU-13: Como usuário, quero registrar o peso utilizado em cada série
 
 ### 🧩 Tarefas Técnicas
 T3.1 - Criar tela de execução de treino
 
+- O Treino deve ser iniciado a partir da screen de "HOME"
+  - implementar um componente que exiba as fichas que sejá possível iniciar o treino da ficah (sheet)
 - Desenvolver layout com lista de exercícios da ficha
 - Implementar navegação entre exercícios
 - Exibir dados do exercício atual (nome, repetições planejadas)
@@ -50,7 +52,7 @@ T3.6 - Permitir pular exercícios
 
 - Adicionar ação "Pular" no exercício atual
 - Registrar exercício como pulado no log
-- Avançar para próximo exer## ✅ Critérios de Aceite por Feature
+- Avançar para próximo exercício
 
 ### 🧪 Especificações BDD
 
