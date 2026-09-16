@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Expo / React Native (submodule)
+.expo/
+dist/
+web-build/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS and editor
+.DS_Store
+*.pem
+
+# Logs and debug
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*

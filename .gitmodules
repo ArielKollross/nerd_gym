@@ -1,0 +1,3 @@
+[submodule "nerd-gym"]
+	path = nerd-gym
+	url = https://github.com/ArielKollross/nerd-gym.git
