@@ -7,16 +7,17 @@ description: Use when implementing or changing a feature, fixing a bug, or updat
 
 Use this workflow for focused product changes in the active `gym-app/` application. Keep changes aligned with the user's request, the product specification, and the app's existing patterns.
 
-## Start every task on a new branch
+## Start every task from `master` on a new branch
 
 Before editing files:
 
-1. Find the Git repository root and inspect `git status --short --branch` and the current branch.
-2. Preserve all existing work. Do not reset, discard, or stash user changes. Remember that uncommitted changes remain in the working tree after switching branches; leave unrelated edits untouched. If existing edits overlap the requested change, keep them intact and clarify how to proceed before touching those files.
-3. Create a fresh branch from the current commit, named for the work: `feat/<short-name>` for a feature, `fix/<short-name>` for a bug, or `chore/<short-name>` for maintenance. If that name already exists, add a short numeric suffix.
-4. Confirm the new branch is active before editing. If Git cannot create or switch to it safely, stop before editing and explain the blocker.
+1. Find the Git repository root and inspect `git status --short --branch`, the current branch, and `master`.
+2. Never edit or commit task changes directly on `master`. Start each separate task from `master`, updating it only with a fast-forward from `origin/master` when available.
+3. Preserve existing work. Do not reset, discard, or stash user changes. If the working tree is dirty, use an isolated worktree based on `master` when the task can be separated safely; if existing edits overlap or cannot be separated, clarify before editing.
+4. Create a fresh branch from `master`, named for the work: `feat/<short-name>` for a feature, `fix/<short-name>` for a bug, or `chore/<short-name>` for maintenance. If that name already exists, add a short numeric suffix.
+5. Confirm the new branch is active and based on `master` before editing. If Git cannot establish that safely, stop before editing and explain the blocker.
 
-Creating the branch is mandatory, including for urgent fixes. A deadline is not a reason to edit on the current branch; if the new branch cannot be created safely, stop before changing files. Create one branch when a task starts and continue that same task on it across turns; create another branch for a separate task, even if the current branch already looks task-specific. Do not commit, push, merge, or publish unless the user asks.
+Creating the branch is mandatory, including for urgent fixes. A deadline is not a reason to edit on the current branch; if the new branch cannot be created safely, stop before changing files. Create one branch when a task starts and continue that same task on it across turns; create another branch from `master` for a separate task, even if the current branch already looks task-specific. Keep all task commits on the task branch. Open PRs against `master`; changes reach `master` through an approved PR and code review, never through direct commits. Do not push or publish unless the user asks.
 
 ## Understand the change
 
@@ -31,7 +32,7 @@ Creating the branch is mandatory, including for urgent fixes. A deadline is not 
 Before touching Expo, EAS, or React Native APIs, read the `expo` major version from `package.json`, then consult the matching versioned Expo documentation. For other Expo documentation, use the official docs index at `https://docs.expo.dev/llms.txt` and follow it to the relevant page; do not rely on remembered APIs.
 
 - Use Expo Router for navigation. Screen routes belong in `src/app/`; shared components, hooks, and utilities belong outside it.
-- If a dependency is needed, check SDK compatibility, Expo Go support, and native requirements first. Check whether native setup or a config plugin is needed, then use `npx expo install <package>` (or `bunx` when the project has `bun.lock`). Explain when a development build is required and verify the available setup path before treating the dependency as integrated.
+- If a dependency is needed, check SDK compatibility, Expo Go support, and native requirements first. Check whether native setup or a config plugin is needed, then use `npx expo install <package>`. Explain when a development build is required and verify the available setup path before treating the dependency as integrated.
 - When Continuous Native Generation is in use and `ios/` or `android/` are absent, configure native behavior through app config or config plugins; do not create those directories by hand.
 - Prefer mobile-first, performant, cross-platform solutions that match the current app.
 
