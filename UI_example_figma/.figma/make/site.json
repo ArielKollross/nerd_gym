@@ -1,0 +1,10 @@
+{
+  "description": "This app allows users to create and track their gym workouts, displaying exercises, sets, and reps while providing a visual training calendar.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
