@@ -1,30 +1,30 @@
-import '@/global.css';
+import "@/global.css";
 
-import { useEffect } from 'react';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { Platform } from 'react-native';
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { Platform } from "react-native";
 
-if (Platform.OS !== 'web') {
-  void SplashScreen.preventAutoHideAsync();
+if (Platform.OS !== "web") {
+	void SplashScreen.preventAutoHideAsync();
 }
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
-    'DM Sans': require('../../assets/fonts/DM-Sans-Variable.ttf'),
-    Manrope: require('../../assets/fonts/Manrope-Variable.ttf'),
-  });
+	const [fontsLoaded, fontError] = useFonts({
+		"DM Sans": require("../../assets/fonts/DM-Sans-Variable.ttf"),
+		Manrope: require("../../assets/fonts/Manrope-Variable.ttf"),
+	});
 
-  useEffect(() => {
-    if ((fontsLoaded || fontError) && Platform.OS !== 'web') {
-      void SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
+	useEffect(() => {
+		if ((fontsLoaded || fontError) && Platform.OS !== "web") {
+			void SplashScreen.hideAsync();
+		}
+	}, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+	if (!fontsLoaded && !fontError) {
+		return null;
+	}
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+	return <Stack screenOptions={{ headerShown: false }} />;
 }
