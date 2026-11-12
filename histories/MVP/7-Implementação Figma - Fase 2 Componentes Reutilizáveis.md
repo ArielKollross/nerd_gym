@@ -57,7 +57,9 @@ Antes de implementar cada tarefa, confira as referências no protótipo atual. S
 
 **Origem na referência:** `UI_example_figma/src/App.tsx:151-182`, componente `Heatmap`; `UI_example_figma/src/index.css:58-64`, seletores `.heatmap-shell`, `.heatmap-months`, `.heatmap`, `.heat-cell`, `.level-1` a `.level-4` e `.heatmap-legend`.
 
-**Resultado esperado em Expo:** representar os dias e cinco níveis visuais com componentes nativos, legenda e adaptação para a largura disponível. O conjunto da grade na referência é determinístico e demonstrativo, não histórico persistido.
+**Resultado esperado em Expo:** representar os dias e três níveis visuais com componentes nativos, legenda e adaptação para a largura disponível: 0 sem atividade em cor neutra, 1 atividade em verde `#4b9a60` e 2 ou mais atividades em verde `#1f6a46`. O conjunto da grade é determinístico e demonstrativo, não histórico persistido.
+
+**Ajuste aprovado:** reduzir a escala para três níveis (0, 1 e 2 ou mais atividades), removendo apenas o tom `#cbe5b0`. Os verdes devem ser tokens do tema, preservados nos modos claro e escuro. A legenda, os dias e os rótulos acessíveis devem usar a mesma escala.
 
 **Dependência:** fase 1.
 

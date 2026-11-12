@@ -41,3 +41,11 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Color tokens
+
+All app colors must be defined as tokens in `src/constants/theme.ts` for both light and dark themes and consumed through `useTheme()` (or the existing theme helpers). Never define color literals in components, local constants, inline styles, or `className`, including arbitrary values and utility palette colors. Add a semantic theme token before introducing a new color.
+
+## Descriptive names
+
+Use descriptive names for constants, variables, and parameters that communicate their purpose. Avoid single-letter names and cryptic abbreviations. Name the value returned by `useTheme()` `theme` (or a more specific descriptive name when needed), never `c`. Apply this convention consistently to declarations and all references.
