@@ -5,13 +5,39 @@
 
 import { Platform } from "react-native";
 
+// Fixed contrast pairs for strong surfaces, brand accents, and advertisements.
+// Shared by both themes to preserve their intended appearance.
+const fixedColors = {
+	onStrong: "#ffffff",
+	onStrongMuted: "#c5c9bf",
+	onStrongSecondary: "#e0e3dc",
+	onAccent: "#171915",
+	headerTextSecondary: "#d5d8cf",
+	switchThumb: "#ffffff",
+	error: "#be514b",
+	transparent: "transparent",
+	modalBackdrop: "#10120eb8",
+	adHomeBackground: "#2c3426",
+	adWorkoutsBackground: "#303149",
+	adProgressBackground: "#3f3023",
+	adHeaderBackground: "#161914",
+	adFooterBackground: "#242720",
+	adDisclosureText: "#cdd2c7",
+	adTextSecondary: "#d0d5cb",
+	welcomeBackground: "#25292e",
+	welcomeText: "#ffffff",
+} as const;
+
 const lightPalette = {
+	...fixedColors,
 	ink: "#171915",
 	paper: "#f6f7f1",
 	muted: "#73786e",
 	line: "#dfe1d9",
 	lime: "#c8f04c",
 	green: "#1f6a46",
+	activitySingle: "#4b9a60",
+	activityMultiple: "#1f6a46",
 	surface: "#ffffff",
 	surfaceMuted: "#eceee7",
 	surfaceSelected: "#e8eae2",
@@ -19,12 +45,15 @@ const lightPalette = {
 } as const;
 
 const darkPalette = {
+	...fixedColors,
 	ink: "#f2f4ed",
 	paper: "#151713",
 	muted: "#989d93",
 	line: "#343831",
 	lime: "#c8f04c",
 	green: "#9bcc70",
+	activitySingle: "#4b9a60",
+	activityMultiple: "#1f6a46",
 	surface: "#1c1f1a",
 	surfaceMuted: "#22251f",
 	surfaceSelected: "#2b2f28",

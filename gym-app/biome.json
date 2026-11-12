@@ -16,6 +16,12 @@
 		"enabled": true,
 		"rules": {
 			"preset": "recommended",
+			"correctness": {
+				"noReactNativeRawText": {
+					"level": "error",
+					"options": { "skip": ["AppText"] }
+				}
+			},
 			"suspicious": {
 				"noUnknownAtRules": {
 					"level": "error",
