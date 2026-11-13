@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { Platform } from "react-native";
+import { DemoAccountProvider } from "@/contexts/demo-account";
 import { WorkoutsProvider } from "@/contexts/workouts";
 
 if (Platform.OS !== "web") {
@@ -28,8 +29,10 @@ export default function RootLayout() {
 	}
 
 	return (
-		<WorkoutsProvider>
-			<Stack screenOptions={{ headerShown: false }} />
-		</WorkoutsProvider>
+		<DemoAccountProvider>
+			<WorkoutsProvider>
+				<Stack screenOptions={{ headerShown: false }} />
+			</WorkoutsProvider>
+		</DemoAccountProvider>
 	);
 }
