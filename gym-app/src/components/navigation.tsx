@@ -97,18 +97,18 @@ export function BottomNavigation({
 						key={item.id}
 						accessibilityRole="tab"
 						accessibilityState={{ selected: active === item.id }}
+						aria-selected={active === item.id}
 						onPress={() => onSelect(item.id)}
-						style={({ pressed }) => ({
+						style={{
 							flex: 1,
 							minHeight: 56,
 							alignItems: "center",
 							justifyContent: "center",
 							gap: 4,
-							opacity: pressed ? 0.6 : 1,
 							borderTopWidth: 3,
 							borderTopColor:
 								active === item.id ? theme.green : theme.transparent,
-						})}
+						}}
 					>
 						<Icon
 							name={item.icon}

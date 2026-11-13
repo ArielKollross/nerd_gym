@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import { useState } from "react";
 import {
 	Keyboard,
@@ -43,7 +42,7 @@ export function ProfileScreen() {
 	}
 	return (
 		<SafeAreaView
-			edges={["top", "bottom", "left", "right"]}
+			edges={["left", "right"]}
 			className="flex-1"
 			style={{ backgroundColor: theme.surfaceMuted }}
 		>
@@ -65,14 +64,6 @@ export function ProfileScreen() {
 							backgroundColor: theme.paper,
 						}}
 					>
-						<Button
-							variant="secondary"
-							label="Voltar ao Início"
-							onPress={() => {
-								if (router.canGoBack()) router.back();
-								else router.replace("/");
-							}}
-						/>
 						<SectionHeading eyebrow="SUA CONTA" title="Perfil" />
 						<ThemeSetting
 							dark={account.themeMode === "dark"}

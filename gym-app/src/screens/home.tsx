@@ -11,6 +11,7 @@ import { MetricCard } from "@/components/progress";
 import { AppText, Duration, SectionHeading } from "@/components/typography";
 import { ExerciseRow } from "@/components/workout-card";
 import { Images } from "@/constants/assets";
+import { useDemoAccount } from "@/contexts/demo-account";
 import { nextDemoWorkout } from "@/data/demo-workouts";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -94,13 +95,14 @@ function HomeHero() {
 }
 
 export function HomeScreen() {
+	const { status } = useDemoAccount();
 	const theme = useTheme();
 	const previewExercises = nextDemoWorkout.exercises.slice(0, 3);
 	const remainingExercises =
 		nextDemoWorkout.exercises.length - previewExercises.length;
 	return (
 		<SafeAreaView
-			edges={["top", "bottom", "left", "right"]}
+			edges={["left", "right"]}
 			className="flex-1"
 			style={{ backgroundColor: theme.surfaceMuted }}
 		>
@@ -170,7 +172,7 @@ export function HomeScreen() {
 						/>
 					</View>
 					<View className="px-5 pb-7">
-						<AdBanner variant="home" />
+						{status !== "premium" ? <AdBanner variant="home" /> : null}
 					</View>
 					<View
 						className="gap-5 px-5 py-7"
