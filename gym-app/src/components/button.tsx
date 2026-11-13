@@ -42,6 +42,8 @@ export function Button({
 	return (
 		<Pressable
 			{...props}
+			// Preserve the style callback; NativeWind's native interop flattens it.
+			cssInterop={false}
 			accessibilityRole="button"
 			accessibilityLabel={accessibilityLabel ?? label}
 			accessibilityState={{ ...accessibilityState, disabled: !!disabled }}
