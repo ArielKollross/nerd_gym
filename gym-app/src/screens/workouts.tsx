@@ -4,13 +4,16 @@ import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AdBanner } from "@/components/ad-banner";
 import { Button } from "@/components/button";
+import { CreateWorkout } from "@/components/create-workout";
 import { AppText, SectionHeading } from "@/components/typography";
 import { WorkoutCard } from "@/components/workout-card";
-import { demoWorkouts } from "@/data/demo-workouts";
+import { useWorkouts } from "@/contexts/workouts";
 import { useTheme } from "@/hooks/use-theme";
 
 export function WorkoutsScreen() {
 	const theme = useTheme();
+	const { workouts, addWorkout } = useWorkouts();
+	const [creating, setCreating] = useState(false);
 	const [contentWidth, setContentWidth] = useState(0);
 	const wideLayout = contentWidth >= 650;
 	return (
@@ -42,12 +45,23 @@ export function WorkoutsScreen() {
 							else router.replace("/");
 						}}
 					/>
-					<SectionHeading eyebrow="SUAS ROTINAS" title="Meus treinos" />
+					<SectionHeading
+						eyebrow="SUAS ROTINAS"
+						title="Meus treinos"
+						action={
+							<Button
+								variant="round"
+								icon="plus"
+								accessibilityLabel="Criar treino"
+								onPress={() => setCreating(true)}
+							/>
+						}
+					/>
 					<AppText variant="subtitle" muted>
 						Escolha uma rotina e comece a se mover.
 					</AppText>
 					<View className="flex-row flex-wrap gap-3">
-						{demoWorkouts.map((workout, index) => (
+						{workouts.map((workout, index) => (
 							<View
 								key={workout.id}
 								style={{ width: wideLayout ? (contentWidth - 84) / 2 : "100%" }}
@@ -68,6 +82,15 @@ export function WorkoutsScreen() {
 					<AdBanner variant="workouts" />
 				</View>
 			</ScrollView>
+			{creating && (
+				<CreateWorkout
+					onClose={() => setCreating(false)}
+					onCreate={(workout) => {
+						addWorkout(workout);
+						setCreating(false);
+					}}
+				/>
+			)}
 		</SafeAreaView>
 	);
 }

@@ -1,10 +1,11 @@
 import { Redirect, router, useLocalSearchParams } from "expo-router";
-import { demoWorkouts } from "@/data/demo-workouts";
+import { useWorkouts } from "@/contexts/workouts";
 import { WorkoutEntryScreen } from "@/screens/workout-entry";
 
 export default function WorkoutEntry() {
 	const { id } = useLocalSearchParams<{ id: string }>();
-	const workout = demoWorkouts.find((routine) => String(routine.id) === id);
+	const { workouts } = useWorkouts();
+	const workout = workouts.find((routine) => String(routine.id) === id);
 	if (!workout) return <Redirect href="/" />;
 	return (
 		<WorkoutEntryScreen

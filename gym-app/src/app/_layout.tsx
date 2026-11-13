@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { Platform } from "react-native";
+import { WorkoutsProvider } from "@/contexts/workouts";
 
 if (Platform.OS !== "web") {
 	void SplashScreen.preventAutoHideAsync();
@@ -26,5 +27,9 @@ export default function RootLayout() {
 		return null;
 	}
 
-	return <Stack screenOptions={{ headerShown: false }} />;
+	return (
+		<WorkoutsProvider>
+			<Stack screenOptions={{ headerShown: false }} />
+		</WorkoutsProvider>
+	);
 }
