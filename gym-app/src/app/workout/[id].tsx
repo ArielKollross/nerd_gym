@@ -9,6 +9,7 @@ export default function WorkoutEntry() {
 	if (!workout) return <Redirect href="/" />;
 	return (
 		<WorkoutEntryScreen
+			key={workout.id}
 			workout={workout}
 			onClose={() => {
 				if (router.canGoBack()) router.back();

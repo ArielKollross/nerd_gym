@@ -1,16 +1,22 @@
+import { type ComponentRef, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	ActiveWorkoutHeader,
 	Prescription,
 	SetRow,
+	WorkoutNextButton,
 	WorkoutProgress,
 } from "@/components/active-workout";
 import { AppText, SectionHeading } from "@/components/typography";
 import { useTheme } from "@/hooks/use-theme";
 import type { Workout } from "@/types/workout";
+import {
+	completeWorkoutExercise,
+	getWorkoutStep,
+} from "@/utils/active-workout";
 
-/** Entrada da T3.1. Avanço e finalização serão compostos na T3.6. */
+/** Sessão demonstrativa: nenhum avanço é registrado no histórico. */
 export function WorkoutEntryScreen({
 	workout,
 	onClose,
@@ -19,21 +25,34 @@ export function WorkoutEntryScreen({
 	onClose: () => void;
 }) {
 	const theme = useTheme();
-	const exercise = workout.exercises[0];
+	const [completed, setCompleted] = useState(0);
+	const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+	const total = workout.exercises.length;
+	const { current, progress } = getWorkoutStep(completed, total);
+	const exercise = workout.exercises[current];
+	const last = current === total - 1;
+
+	function complete() {
+		setCompleted((previous) => completeWorkoutExercise(previous, total));
+		if (!last) scrollRef.current?.scrollTo({ y: 0, animated: false });
+	}
 	return (
 		<View className="flex-1" style={{ backgroundColor: theme.paper }}>
 			<View style={{ width: "100%", maxWidth: 720, alignSelf: "center" }}>
 				<ActiveWorkoutHeader name={workout.name} onClose={onClose} />
-				<WorkoutProgress value={0} />
+				<WorkoutProgress value={progress} />
 			</View>
-			<ScrollView contentContainerStyle={{ alignItems: "center" }}>
+			<ScrollView
+				ref={scrollRef}
+				contentContainerStyle={{ alignItems: "center" }}
+			>
 				<SafeAreaView
 					edges={["bottom", "left", "right"]}
 					style={{ width: "100%", maxWidth: 720 }}
 				>
 					<View className="gap-5 px-5 py-8">
 						<AppText variant="title">
-							01{" "}
+							{String(current + 1).padStart(2, "0")}{" "}
 							<AppText muted>
 								/ {String(workout.exercises.length).padStart(2, "0")}
 							</AppText>
@@ -53,6 +72,7 @@ export function WorkoutEntryScreen({
 								/>
 							))}
 						</View>
+						<WorkoutNextButton last={last} onPress={complete} />
 						<AppText variant="meta" muted>
 							Sessão demonstrativa · relógio e cargas ilustrativos.
 						</AppText>
