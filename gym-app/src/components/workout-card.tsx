@@ -54,6 +54,17 @@ export function WorkoutCard({
 	onStart?: () => void;
 }) {
 	const theme = useTheme();
+	const indexColors = [
+		{ background: theme.workoutIndexBackground, text: theme.workoutIndexText },
+		{
+			background: theme.workoutIndexAlternateBackground,
+			text: theme.workoutIndexAlternateText,
+		},
+		{
+			background: theme.workoutIndexWarmBackground,
+			text: theme.workoutIndexWarmText,
+		},
+	][(order - 1) % 3];
 	return (
 		<View
 			className="flex-row items-center gap-3 rounded-2xl p-4"
@@ -65,9 +76,9 @@ export function WorkoutCard({
 		>
 			<View
 				className="self-stretch items-center justify-center rounded-xl px-3"
-				style={{ backgroundColor: theme.surfaceSelected, minHeight: 88 }}
+				style={{ backgroundColor: indexColors.background, minHeight: 88 }}
 			>
-				<AppText style={{ color: theme.green, fontWeight: "800" }}>
+				<AppText style={{ color: indexColors.text, fontWeight: "800" }}>
 					{String(order).padStart(2, "0")}
 				</AppText>
 			</View>

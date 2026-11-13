@@ -43,6 +43,12 @@ const lightPalette = {
 	surfaceMuted: "#eceee7",
 	surfaceSelected: "#e8eae2",
 	surfaceStrong: "#171915",
+	workoutIndexBackground: "#d9efc6",
+	workoutIndexText: "#25482e",
+	workoutIndexAlternateBackground: "#e2e0f4",
+	workoutIndexAlternateText: "#484171",
+	workoutIndexWarmBackground: "#f1dfc4",
+	workoutIndexWarmText: "#6d4d25",
 } as const;
 
 const darkPalette = {
@@ -59,6 +65,12 @@ const darkPalette = {
 	surfaceMuted: "#22251f",
 	surfaceSelected: "#2b2f28",
 	surfaceStrong: "#0d0f0c",
+	workoutIndexBackground: "#293d25",
+	workoutIndexText: "#c6e6b1",
+	workoutIndexAlternateBackground: "#353044",
+	workoutIndexAlternateText: "#d5cef2",
+	workoutIndexWarmBackground: "#433524",
+	workoutIndexWarmText: "#eed5af",
 } as const;
 
 export const Colors = {
