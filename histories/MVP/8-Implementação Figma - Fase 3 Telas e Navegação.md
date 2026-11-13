@@ -49,6 +49,8 @@ Antes de implementar cada tarefa, confira as referências no protótipo atual. S
 
 **Resultado esperado em Expo:** exibir métricas, heatmap anual e próximo marco usando dados determinísticos/demonstrativos do protótipo.
 
+**Ajuste aprovado:** reutilizar a grade da T2.5 com três níveis: 0 sem atividade, 1 atividade e 2 ou mais atividades. A referência web usa cinco níveis (0–4); essa diferença é intencional no app. Preservar a geração determinística de 364 dias, o ano demonstrativo de 2025 e a legenda e os rótulos acessíveis da escala de três níveis. Os valores de 94 treinos e 16 dias são métricas ilustrativas do protótipo, não totais calculados a partir da grade.
+
 **Dependência:** T2.3, T2.5, T2.6 e T2.8.
 
 **Aceite:** métricas, níveis da grade e marco têm rótulos compreensíveis; conteúdo adapta-se a telas estreitas e largas; alterações no estado de conta podem ocultar o banner conforme demonstração, sem publicidade integrada.
