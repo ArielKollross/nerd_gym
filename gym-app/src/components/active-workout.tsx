@@ -58,6 +58,9 @@ export function WorkoutProgress({ value }: { value: number }) {
 			accessibilityRole="progressbar"
 			accessibilityLabel="Progresso do treino"
 			accessibilityValue={{ min: 0, max: 100, now: progress }}
+			aria-valuemin={0}
+			aria-valuemax={100}
+			aria-valuenow={progress}
 			style={{ height: 6, backgroundColor: theme.surfaceSelected }}
 		>
 			<View

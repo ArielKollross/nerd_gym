@@ -12,6 +12,7 @@ const fixedColors = {
 	onStrongMuted: "#c5c9bf",
 	onStrongSecondary: "#e0e3dc",
 	onAccent: "#171915",
+	heroShade: "#121510",
 	headerTextSecondary: "#d5d8cf",
 	switchThumb: "#ffffff",
 	error: "#be514b",
