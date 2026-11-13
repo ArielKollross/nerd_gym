@@ -7,6 +7,7 @@ import { ExerciseRow } from "./workout-card";
 
 export function FormField({
 	label,
+	fieldId,
 	error,
 	disabled,
 	action,
@@ -17,6 +18,7 @@ export function FormField({
 	...props
 }: TextInputProps & {
 	label: string;
+	fieldId?: string;
 	error?: string;
 	disabled?: boolean;
 	action?: ReactNode;
@@ -24,7 +26,8 @@ export function FormField({
 }) {
 	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
-	const id = useId();
+	const generatedId = useId();
+	const id = fieldId ?? generatedId;
 	return (
 		<View className="gap-2" style={{ opacity: disabled ? 0.5 : 1 }}>
 			<AppText nativeID={`${id}-label`} variant="label" muted>

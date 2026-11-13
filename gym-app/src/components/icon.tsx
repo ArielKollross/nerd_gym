@@ -11,6 +11,8 @@ export type IconName =
 	| "chevron"
 	| "clock"
 	| "dumbbell"
+	| "eye"
+	| "eye-off"
 	| "flame"
 	| "home"
 	| "moon"
@@ -56,6 +58,17 @@ const paths: Record<IconName, ReactNode> = {
 	dumbbell: (
 		<>
 			<Path d="M6.5 6.5v11M3.5 8.5v7M17.5 6.5v11M20.5 8.5v7M6.5 12h11" />
+		</>
+	),
+	eye: (
+		<>
+			<Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+			<Circle cx="12" cy="12" r="3" />
+		</>
+	),
+	"eye-off": (
+		<>
+			<Path d="m3 3 18 18M10.6 5.1A12 12 0 0 1 12 5c6.5 0 10 7 10 7a19 19 0 0 1-3 3.9M6.2 6.2A22 22 0 0 0 2 12s3.5 7 10 7a12 12 0 0 0 5.8-1.8M9.9 9.9a3 3 0 0 0 4.2 4.2" />
 		</>
 	),
 	flame: (
