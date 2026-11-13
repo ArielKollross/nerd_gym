@@ -214,6 +214,12 @@ export function HomeScreen() {
 						<AppText variant="meta" muted>
 							Métricas demonstrativas.
 						</AppText>
+						<Button
+							label="Ver progresso"
+							variant="secondary"
+							fullWidth
+							onPress={() => router.push("/progress")}
+						/>
 						{__DEV__ ? (
 							<Link
 								href="/catalog"
