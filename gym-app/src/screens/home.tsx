@@ -152,6 +152,12 @@ export function HomeScreen() {
 							))}
 						</View>
 						<Button
+							label="Meus treinos"
+							variant="secondary"
+							fullWidth
+							onPress={() => router.push("/workouts")}
+						/>
+						<Button
 							label="Iniciar treino"
 							icon="arrow"
 							fullWidth
