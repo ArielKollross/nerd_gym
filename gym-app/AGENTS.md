@@ -42,6 +42,11 @@ Docs: https://docs.expo.dev/eas/index.md
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
 
+## Layout and touch feedback
+
+- Keep essential layout styles — width, height, flex, and spacing — in static style objects.
+- Handle touch feedback separately, without making layout depend on it. In `Pressable`, avoid placing essential layout styles inside the `style` callback used for the pressed state.
+
 ## Color tokens
 
 All app colors must be defined as tokens in `src/constants/theme.ts` for both light and dark themes and consumed through `useTheme()` (or the existing theme helpers). Never define color literals in components, local constants, inline styles, or `className`, including arbitrary values and utility palette colors. Add a semantic theme token before introducing a new color.

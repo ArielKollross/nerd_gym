@@ -7,10 +7,12 @@ import { Button } from "@/components/button";
 import { CreateWorkout } from "@/components/create-workout";
 import { AppText, SectionHeading } from "@/components/typography";
 import { WorkoutCard } from "@/components/workout-card";
+import { useDemoAccount } from "@/contexts/demo-account";
 import { useWorkouts } from "@/contexts/workouts";
 import { useTheme } from "@/hooks/use-theme";
 
 export function WorkoutsScreen() {
+	const { status } = useDemoAccount();
 	const theme = useTheme();
 	const { workouts, addWorkout } = useWorkouts();
 	const [creating, setCreating] = useState(false);
@@ -18,7 +20,7 @@ export function WorkoutsScreen() {
 	const wideLayout = contentWidth >= 650;
 	return (
 		<SafeAreaView
-			edges={["top", "bottom", "left", "right"]}
+			edges={["left", "right"]}
 			className="flex-1"
 			style={{ backgroundColor: theme.surfaceMuted }}
 		>
@@ -37,14 +39,6 @@ export function WorkoutsScreen() {
 						backgroundColor: theme.paper,
 					}}
 				>
-					<Button
-						variant="secondary"
-						label="Voltar ao Início"
-						onPress={() => {
-							if (router.canGoBack()) router.back();
-							else router.replace("/");
-						}}
-					/>
 					<SectionHeading
 						eyebrow="SUAS ROTINAS"
 						title="Meus treinos"
@@ -79,7 +73,7 @@ export function WorkoutsScreen() {
 							</View>
 						))}
 					</View>
-					<AdBanner variant="workouts" />
+					{status !== "premium" ? <AdBanner variant="workouts" /> : null}
 				</View>
 			</ScrollView>
 			{creating && (
