@@ -25,6 +25,10 @@ npx expo install --fix      # fix incompatible package versions
 
 Run lint and typecheck before declaring any task done.
 
+## Application verification
+
+When verifying the app, test on a physical device via ADB whenever possible. If a physical device is unavailable, use an emulator or simulator. Use the web target only as a last resort, since its behavior and rendering can differ from the native app.
+
 ## Navigation & Routing
 
 - Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
