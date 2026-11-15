@@ -1,130 +1,93 @@
-## Feature 3: Execução de Treino Guiada
-Prioridade: 🔴 Alta | Dependências: Feature 1
+# Feature 3: Execução de Treino Guiada
 
-### 📝 Histórias de Usuário
+## Objetivo e dependências
 
-- HU-07: Como usuário, quero iniciar um treino baseado em uma ficha (sheet)
-- HU-08: Como usuário, quero visualizar a sequência de exercícios
-- HU-09: Como usuário, quero marcar séries como concluídas
-- HU-10: Como usuário, quero ver o temporizador de descanso
-- HU-11: Como usuário, quero ouvir alarme ao fim do descanso
-- HU-12: Como usuário, quero poder pular exercícios durante o treino
-- HU-13: Como usuário, quero registrar o peso utilizado em cada série
+Evoluir a interface entregue pelas histórias 0, 6, 7 e 8 para atender à SPEC. Projeto ativo: `gym-app/`; não implementar no legado.
 
-### 🧩 Tarefas Técnicas
-T3.1 - Criar tela de execução de treino
+**Dependências:** Histórias 1 e 2; fornece registros para 4 e 5.
 
-- O Treino deve ser iniciado a partir da screen de "HOME"
-  - implementar um componente que exiba as fichas que sejá possível iniciar o treino da ficah (sheet)
-- Desenvolver layout com lista de exercícios da ficha
-- Implementar navegação entre exercícios
-- Exibir dados do exercício atual (nome, repetições planejadas)
+## Situação atual
 
-T3.2 - Implementar conclusão de séries
+workout/[id], workout-entry e componentes active-workout existem. O avanço é por exercício; primeira série e 80 kg são ilustrativos. Finalizar chega a 100% e mantém a tela aberta, sem histórico.
 
-- Criar botão "Concluir Série" por exercício
-- Registrar timestamp de conclusão
-- Calcular e armazenar volume (peso × repetições)
-- Prevenir duplo clique acidental
+## Tarefas técnicas — TDD antes da implementação
 
-T3.3 - Desenvolver temporizador de descanso
+Cada ciclo abaixo é obrigatório antes do código funcional correspondente. Configurar testes não equivale a comprovar o comportamento; BDD e inspeção visual não substituem testes automatizados.
 
-- Iniciar contagem regressiva automaticamente após concluir série
-- Exibir contador em tela cheia ou overlay
-- Permitir pular/adiantar descanso manualmente
-- Implementar lógica em background (AppState)
+### T3.1 — Sessão real e sequência
 
-T3.4 - Configurar alarme sonoro
+- [ ] **RED — antes de implementar:** escrever testes para iniciar ficha válida com todas as séries pendentes, rejeitar ficha vazia e preservar prescrição após edição posterior da ficha.
+- [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
+- [ ] **GREEN — implementação mínima:** Evoluir rota e tela existentes. Criar sessão persistida com snapshot dos nomes, ordem e prescrições, IDs da ficha e exercícios, início e estado. Mostrar sequência com estados atual, concluído e pulado. Retomar sessão aberta da mesma ficha; impedir segunda sessão simultânea.
+- [ ] Executar os mesmos testes e confirmar aprovação.
+- [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
-- Integrar biblioteca de áudio (react-native-sound)
-- Disparar som ao final do temporizador
-- Respeitar modo silencioso do dispositivo
-- Oferecer opção de vibração
+### T3.2 — Conclusão individual de séries
 
-T3.5 - Implementar registro de peso por série
+- [ ] **RED — antes de implementar:** escrever testes para 50 kg e 10 repetições geram volume 500, toque duplicado grava uma vez e peso ou repetições inválidos impedem conclusão.
+- [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
+- [ ] **GREEN — implementação mínima:** Adicionar entrada de carga positiva e repetições realizadas inteiras positivas. Registrar timestamp e volume por série em transação, com chave única sessão/exercício/série. Sugerir última carga realizada do exercício, com fallback para carga planejada. Não calcular volume pela string de prescrição.
+- [ ] Executar os mesmos testes e confirmar aprovação.
+- [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
-- Criar input de peso antes de concluir série
-- Sugerir último peso utilizado (histórico)
-- Validar entrada numérica
-- Salvar no banco na tabela workout_logs
+### T3.3 — Descanso e transições
 
-T3.6 - Permitir pular exercícios
+- [ ] **RED — antes de implementar:** escrever testes para descanso de 60s termina no horário alvo, retorno após 40s mostra 20s, pular cancela o prazo e não permite concluir durante descanso.
+- [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
+- [ ] **GREEN — implementação mínima:** Persistir horário alvo e recalcular por relógio ao retornar do background. Após série intermediária iniciar descanso; término libera próxima série. Última série avança ao próximo exercício sem descanso final; último exercício leva ao resumo. Descanso zero libera imediatamente. Usar relógio controlado nos testes, sem esperas reais.
+- [ ] Executar os mesmos testes e confirmar aprovação.
+- [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
-- Adicionar ação "Pular" no exercício atual
-- Registrar exercício como pulado no log
-- Avançar para próximo exercício
+### T3.4 — Aviso de fim de descanso
 
-### 🧪 Especificações BDD
+- [ ] **RED — antes de implementar:** escrever testes para fim natural emite aviso uma vez, pular cancela aviso e permissão negada mantém contador funcional.
+- [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
+- [ ] **GREEN — implementação mínima:** Avaliar módulos oficiais compatíveis com a versão instalada antes de integrar áudio, vibração e notificações locais. Validar som e modo silencioso em Android/iOS; não prometer execução contínua de JavaScript em background ou precisão absoluta de entrega do sistema. Pular descanso não dispara alarme.
+- [ ] Executar os mesmos testes e confirmar aprovação.
+- [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
+
+### T3.5 — Sugestão de carga e recuperação
+
+- [ ] **RED — antes de implementar:** escrever testes para histórico sugere última carga, edição da sugestão não altera séries anteriores e reinício recupera série e descanso.
+- [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
+- [ ] **GREEN — implementação mínima:** Consultar último registro por identidade de exercício e data; manter carga anterior no campo após descanso. Restaurar sessão persistida com timestamps. Erro de gravação mantém entrada e permite tentativa sem duplicidade.
+- [ ] Executar os mesmos testes e confirmar aprovação.
+- [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
+
+### T3.6 — Pular, cancelar e finalizar
+
+- [ ] **RED — antes de implementar:** escrever testes para pular mantém séries feitas e marca restantes ignoradas, cancelamento não conta treino concluído e finalizar repetidamente não duplica histórico.
+- [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
+- [ ] **GREEN — implementação mínima:** Pular cancela descanso e avança; no último exercício leva ao resumo. Fechar exige escolher continuar ou cancelar sessão, preservando séries realizadas. Finalizar grava término, duração e volume uma vez e mostra resumo; não manter comportamento demonstrativo de ficar no último exercício. Sessão sem séries feitas não conta como treino realizado.
+- [ ] Executar os mesmos testes e confirmar aprovação.
+- [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
+
+## Critérios de aceite e verificação
+
+- Todas as tarefas acima têm testes aprovados com evidência RED → GREEN e comportamento descrito disponível.
+- Testes unitários cobrem regras; testes de componentes cobrem entradas e ações; integração com SQLite real comprova persistência e transações. Mocks isolados não comprovam durabilidade.
+- Executar testes automatizados, `npm run lint` e `npx tsc --noEmit` em `gym-app/` na futura implementação. Configurar script de testes na T1.1; hoje não existe.
+- Validar fluxos em Android físico via ADB quando disponível, depois emulador/simulador; web como complemento. Conferir tema claro/escuro, teclado, acessibilidade e retorno de navegação.
+- Não incluir autenticação, cobrança, anúncios reais ou sincronização para concluir esta história.
+
+## Cenários BDD
 
 ```gherkin
 # language: pt-br
-Funcionalidade: Executar Treino
-  Como usuário
-  Quero ser guiado durante meu treino na academia
-  Para manter o ritmo e registrar meu desempenho
+Funcionalidade: Execução de Treino Guiada
 
-  Cenário: Iniciar treino baseado em ficha
-    Dado que tenho a ficha "Treino de Costas" com 3 exercícios
-    Quando eu tocar em "Iniciar Treino"
-    Então devo ver o primeiro exercício "Puxada Alta"
-    E ver "Repetições: 3"
-    E ver o campo para informar o peso
+  Cenário: Concluir série
+    Dado que estou na primeira de três séries com descanso de 60 segundos
+    Quando informo 50 kg e 10 repetições e concluo a série
+    Então um único registro de volume 500 é salvo e o descanso inicia
 
-  Cenário: Concluir série com peso
-    Dado que estou executando "Puxada Alta"
-    E informei o peso "40" kg
-    Quando eu tocar em "Concluir Série"
-    Então o temporizador de descanso de 60s deve iniciar
-    E o volume de 120kg (40×3) deve ser registrado
+  Cenário: Retornar do background
+    Dado que o descanso começou há 40 segundos com duração de 60 segundos
+    Quando retorno ao aplicativo
+    Então o contador mostra 20 segundos restantes
 
-  Cenário: Temporizador de descanso automático
-    Dado que concluí uma série
-    Quando o temporizador iniciar
-    Então devo ver a contagem regressiva de 60 segundos
-    E ao chegar em 0 um alarme sonoro deve tocar
-    E o próximo exercício deve ser exibido
-
-  Cenário: Pular exercício durante treino
-    Dado que estou no exercício "Remada Curvada"
-    Quando eu tocar em "Pular Exercício"
-    Então devo avançar para o próximo exercício
-    E o exercício pulado deve ser registrado como "não realizado"
-
-  Cenário: Pular descanso manualmente
-    Dado que o temporizador está em 45s restantes
-    Quando eu tocar em "Pular Descanso"
-    Então devo ir imediatamente para o próximo exercício
-    E o temporizador deve ser cancelado
-
-  Cenário: Finalizar treino
-    Dado que completei todos os exercícios da ficha
-    Quando o último exercício for concluído
-    Então devo ver um resumo do treino
-    E ver o volume total levantado
-    E o treino deve ser salvo no histórico
-
-  Cenário: Visualizar sequência de exercícios
-    Dado que estou executando o treino
-    Quando eu deslizar para baixo
-    Então devo ver a lista completa de exercícios da ficha
-    E o exercício atual deve estar destacado
-    E os concluídos devem estar marcados com ✓
-    E os pulados devem estar marcados como ignorados
-
-  Cenário: Alarme sonoro respeitar modo silencioso
-    Dado que o dispositivo está no modo silencioso
-    Quando o temporizador chegar a 0
-    Então o alarme sonoro NÃO deve tocar
-    Mas o dispositivo deve vibrar
+  Cenário: Finalizar sessão
+    Dado que concluí o último exercício
+    Quando a sessão é finalizada
+    Então vejo resumo e um único registro histórico
 ```
-
-## ✅ Critérios de Aceite por Feature
-
-| ID    | Critério                                                       | Tipo      |
-|-------|----------------------------------------------------------------|-----------|
-| CA3.1 | Temporizador inicia automaticamente após concluir série        | Funcional |
-| CA3.2 | Alarme sonoro toca ao fim do descanso (exceto modo silencioso) | Funcional |
-| CA3.3 | Temporizador continua rodando se app for para background       | Funcional |
-| CA3.4 | Usuário pode pular exercício sem perder progresso dos demais   | Funcional |
-| CA3.5 | Peso registrado deve ser numérico e positivo                   | Validação |
-| CA3.6 | Volume calculado automaticamente (peso × repetições)           | Funcional |
