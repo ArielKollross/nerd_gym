@@ -27,6 +27,8 @@ Run lint and typecheck before declaring any task done.
 
 ## Application verification
 
+Prefer React Native Testing Library (`@testing-library/react-native`) for component and interaction tests. Use Jest directly for rules and functions that can be tested without rendering. Verify persistence and transactions with integration tests against real SQLite on a device or emulator.
+
 When verifying the app, test on a physical device via ADB whenever possible. If a physical device is unavailable, use an emulator or simulator. Use the web target only as a last resort, since its behavior and rendering can differ from the native app.
 
 ## Navigation & Routing
