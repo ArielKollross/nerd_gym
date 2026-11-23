@@ -16,49 +16,50 @@ Cada ciclo abaixo é obrigatório antes do código funcional correspondente. Con
 
 ### T1.1 — Fundação SQLite e testes
 
+- [ ] Configurar `npm test` com Jest 30, o preset `jest-expo` do SDK 58 e React Native Testing Library v14 com renderizador compatível com React 19.3. Configurar uma suíte de integração executável no Android em modo de desenvolvimento, com `expo-sqlite` e banco de teste separado.
 - [ ] **RED — antes de implementar:** escrever testes para migrations em banco vazio e existente, execução repetida sem perda, rollback de escrita parcial e exclusão de ficha preservando exercícios.
 - [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
-- [ ] **GREEN — implementação mínima:** Configurar executor compatível com o Expo instalado e testes de integração SQLite no dispositivo. Criar camada db e repositórios para workout_sheets, exercises e sheet_exercises; migrations versionadas e transações. Parâmetros sets, reps, rest_seconds e current_weight pertencem ao vínculo; nome do exercício pertence à biblioteca. Usar IDs estáveis, ordem e unicidade do exercício por ficha. Integrar inicialização ao layout raiz com carregamento, erro e tentativa novamente.
+- [ ] **GREEN — implementação mínima:** Criar a camada de dados e os repositórios de `workout_sheets`, `exercises` e `sheet_exercises` com migrações versionadas e transações. Os parâmetros `sets`, `reps`, `rest_seconds` e `current_weight` pertencem ao vínculo. O nome pertence ao exercício. Usar IDs estáveis, ordem e unicidade do exercício por ficha. Inicializar o banco no layout raiz com carregamento, erro e opção de tentar novamente. O banco começa vazio.
 - [ ] Executar os mesmos testes e confirmar aprovação.
 - [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
 ### T1.2 — CRUD de fichas na interface existente
 
-- [ ] **RED — antes de implementar:** escrever testes para nome vazio ou menor que 3 caracteres, nomes repetidos válidos, 1 e 20 exercícios aceitos, 21 rejeitados, cancelamento sem escrita e falha ao salvar sem fechar o formulário.
+- [ ] **RED — antes de implementar:** testar nomes vazios ou com menos de 3 caracteres após remover espaços nas pontas, nomes repetidos válidos, 1 e 20 exercícios aceitos e 21 rejeitados. Cobrir edição, cancelamento sem escrita, confirmação de exclusão e nova tentativa de salvar após uma falha.
 - [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
-- [ ] **GREEN — implementação mínima:** Evoluir screens/workouts.tsx, components/create-workout.tsx e contexts/workouts.tsx. Persistir somente ao salvar; adicionar edição e exclusão com confirmação, mantendo o modal e cartões. Excluir vínculos sem apagar biblioteca ou histórico. Atualizar a lista apenas após confirmação da escrita.
+- [ ] **GREEN — implementação mínima:** Evoluir o modal e os cartões existentes para criar, editar e excluir fichas com confirmação. Gravar apenas ao salvar e atualizar a lista após a confirmação da escrita. Se a gravação falhar, manter o modal aberto e preservar o rascunho para tentar novamente. Excluir os vínculos da ficha e preservar biblioteca e histórico.
 - [ ] Executar os mesmos testes e confirmar aprovação.
 - [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
 ### T1.3 — Biblioteca de exercícios
 
-- [ ] **RED — antes de implementar:** escrever testes para busca parcial sem diferenciar maiúsculas, reutilização em duas fichas e alteração do nome refletida nas duas sem alterar parâmetros individuais.
+- [ ] **RED — antes de implementar:** testar busca parcial sem diferenciar maiúsculas, descarte de novo cadastro ao cancelar a ficha, reutilização em duas fichas e alteração do nome refletida nas duas com os parâmetros individuais preservados.
 - [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
-- [ ] **GREEN — implementação mínima:** Adicionar seleção e cadastro de exercício a partir do formulário existente. Identificar por ID, não por nome. Editar nome na biblioteca; manter séries, prescrição de repetições, descanso e carga planejada por ficha. Categorias ficam futuras.
+- [ ] **GREEN — implementação mínima:** Permitir buscar, selecionar, cadastrar e renomear exercícios da biblioteca pelo modal existente. Identificar exercícios por ID e gravar novos cadastros feitos no formulário na mesma transação da ficha. Manter séries, prescrição de repetições, descanso e carga planejada por ficha. Categorias ficam futuras.
 - [ ] Executar os mesmos testes e confirmar aprovação.
 - [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
 ### T1.4 — Configuração e ordenação por ficha
 
-- [ ] **RED — antes de implementar:** escrever testes para mesmo exercício bloqueado duas vezes na ficha, parâmetros independentes entre fichas, ordem preservada após reabrir e remoção sem excluir exercício.
+- [ ] **RED — antes de implementar:** testar validação dos parâmetros, bloqueio de exercício duplicado na ficha, independência dos parâmetros entre fichas, mudança de ordem preservada após reabrir e remoção do vínculo com o exercício preservado na biblioteca.
 - [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
-- [ ] **GREEN — implementação mínima:** Ampliar tipos/workout.ts e linhas do formulário com séries inteiras positivas, prescrição de repetições, descanso em segundos não negativo e carga planejada opcional positiva. Ordenar por controles acessíveis e permitir remover vínculos.
+- [ ] **GREEN — implementação mínima:** Ampliar os tipos e as linhas do formulário com séries inteiras positivas, prescrição textual de repetições, descanso em segundos inteiros não negativos e carga planejada opcional positiva. Oferecer controles acessíveis para mover e remover vínculos.
 - [ ] Executar os mesmos testes e confirmar aprovação.
 - [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
 ### T1.5 — Integrar dados nas rotas existentes
 
-- [ ] **RED — antes de implementar:** escrever testes para Início e Treinos iniciam a mesma ficha persistida, ID ausente não quebra navegação e lista vazia oferece criação.
+- [ ] **RED — antes de implementar:** testar que Início e Treinos abrem a mesma ficha persistida, que a lista vazia oferece criação, que ID ausente ou inválido leva a Início e que fechar um treino válido retorna à tela de origem quando houver histórico de navegação.
 - [ ] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
-- [ ] **GREEN — implementação mínima:** Preservar Início, Treinos, Progresso e Perfil. Substituir nextDemoWorkout em Início por primeira ficha persistida na ordem de criação; em lista vazia oferecer criação em Treinos. Manter /workout/[id] e retorno ao contexto anterior. Não criar abas de biblioteca nem substituir a navegação entregue.
+- [ ] **GREEN — implementação mínima:** Preservar Início, Treinos, Progresso e Perfil. Mostrar em Início a primeira ficha persistida na ordem de criação. Com a lista vazia, levar à criação em Treinos. Abrir fichas por `/workout/[id]` e manter o retorno à tela de origem, com Início como destino quando não houver histórico de navegação.
 - [ ] Executar os mesmos testes e confirmar aprovação.
 - [ ] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
 ## Critérios de aceite e verificação
 
 - Todas as tarefas acima têm testes aprovados com evidência RED → GREEN e comportamento descrito disponível.
-- Testes unitários cobrem regras; testes de componentes cobrem entradas e ações; integração com SQLite real comprova persistência e transações. Mocks isolados não comprovam durabilidade.
-- Executar testes automatizados, `npm run lint` e `npx tsc --noEmit` em `gym-app/` na futura implementação. Configurar script de testes na T1.1; hoje não existe.
+- Usar preferencialmente a React Native Testing Library para componentes, interações e navegação. Usar Jest direto para regras e funções que dispensam renderização. Rodar com SQLite real no Android os testes de migração, rollback, preservação da biblioteca, independência de parâmetros e persistência após fechar e reabrir.
+- Executar `npm test`, `npm run lint` e `npx tsc --noEmit` em `gym-app/` na implementação.
 - Validar fluxos em Android físico via ADB quando disponível, depois emulador/simulador; web como complemento. Conferir tema claro/escuro, teclado, acessibilidade e retorno de navegação.
 - Não incluir autenticação, cobrança, anúncios reais ou sincronização para concluir esta história.
 - Medir CRUD com até 50 fichas: alvo inferior a 100 ms; registrar dispositivo e condições. Categorias da SPEC permanecem futuras. Nomes repetidos são permitidos; alterar parâmetros afeta somente a ficha editada.
