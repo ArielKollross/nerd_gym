@@ -48,10 +48,14 @@ export function WorkoutCard({
 	workout,
 	order,
 	onStart,
+	onEdit,
+	onDelete,
 }: {
 	workout: Workout;
 	order: number;
 	onStart?: () => void;
+	onEdit?: () => void;
+	onDelete?: () => void;
 }) {
 	const theme = useTheme();
 	const indexColors = [
@@ -99,6 +103,22 @@ export function WorkoutCard({
 						<Duration minutes={workout.duration} />
 					) : null}
 				</View>
+				{onEdit && onDelete && (
+					<View className="flex-row flex-wrap gap-2">
+						<Button
+							label="Editar"
+							variant="secondary"
+							accessibilityLabel={`Editar ${workout.name}`}
+							onPress={onEdit}
+						/>
+						<Button
+							label="Excluir"
+							variant="secondary"
+							accessibilityLabel={`Excluir ${workout.name}`}
+							onPress={onDelete}
+						/>
+					</View>
+				)}
 			</View>
 			{onStart ? (
 				<Button

@@ -1,5 +1,5 @@
-import { type ComponentRef, useRef, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { useRef, useState } from "react";
+import { View, VirtualizedList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
 	ActiveWorkoutHeader,
@@ -26,7 +26,7 @@ export function WorkoutEntryScreen({
 }) {
 	const theme = useTheme();
 	const [completed, setCompleted] = useState(0);
-	const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+	const scrollRef = useRef<InstanceType<typeof VirtualizedList>>(null);
 	const total = workout.exercises.length;
 	const { current, progress } = getWorkoutStep(completed, total);
 	const exercise = workout.exercises[current];
@@ -34,7 +34,8 @@ export function WorkoutEntryScreen({
 
 	function complete() {
 		setCompleted((previous) => completeWorkoutExercise(previous, total));
-		if (!last) scrollRef.current?.scrollTo({ y: 0, animated: false });
+		if (!last)
+			scrollRef.current?.scrollToOffset({ offset: 0, animated: false });
 	}
 	return (
 		<View className="flex-1" style={{ backgroundColor: theme.paper }}>
@@ -42,43 +43,48 @@ export function WorkoutEntryScreen({
 				<ActiveWorkoutHeader name={workout.name} onClose={onClose} />
 				<WorkoutProgress value={progress} />
 			</View>
-			<ScrollView
-				ref={scrollRef}
-				contentContainerStyle={{ alignItems: "center" }}
+			<SafeAreaView
+				edges={["bottom", "left", "right"]}
+				style={{ flex: 1, width: "100%", maxWidth: 720, alignSelf: "center" }}
 			>
-				<SafeAreaView
-					edges={["bottom", "left", "right"]}
-					style={{ width: "100%", maxWidth: 720 }}
-				>
-					<View className="gap-5 px-5 py-8">
-						<AppText variant="title">
-							{String(current + 1).padStart(2, "0")}{" "}
-							<AppText muted>
-								/ {String(workout.exercises.length).padStart(2, "0")}
+				<VirtualizedList
+					ref={scrollRef}
+					data={exercise.sets}
+					getItemCount={(sets: number) => sets}
+					getItem={(_sets: number, index) => index + 1}
+					keyExtractor={(order) => String(order)}
+					contentContainerStyle={{
+						paddingHorizontal: 20,
+						paddingVertical: 32,
+						gap: 12,
+					}}
+					ListHeaderComponent={
+						<View className="gap-5 pb-2">
+							<AppText variant="title">
+								{String(current + 1).padStart(2, "0")}{" "}
+								<AppText muted>/ {String(total).padStart(2, "0")}</AppText>
 							</AppText>
-						</AppText>
-						<SectionHeading eyebrow="EXERCÍCIO ATUAL" title={exercise.name} />
-						<Prescription sets={exercise.sets} reps={exercise.reps} />
-						<View className="gap-3">
-							{Array.from(
-								{ length: exercise.sets },
-								(_, index) => index + 1,
-							).map((order) => (
-								<SetRow
-									key={order}
-									order={order}
-									completed={order === 1}
-									weight={order === 1 ? "80 kg" : "— kg"}
-								/>
-							))}
+							<SectionHeading eyebrow="EXERCÍCIO ATUAL" title={exercise.name} />
+							<Prescription sets={exercise.sets} reps={exercise.reps} />
 						</View>
-						<WorkoutNextButton last={last} onPress={complete} />
-						<AppText variant="meta" muted>
-							Sessão demonstrativa · relógio e cargas ilustrativos.
-						</AppText>
-					</View>
-				</SafeAreaView>
-			</ScrollView>
+					}
+					renderItem={({ item: order }) => (
+						<SetRow
+							order={order}
+							completed={order === 1}
+							weight={order === 1 ? "80 kg" : "— kg"}
+						/>
+					)}
+					ListFooterComponent={
+						<View className="gap-5 pt-2">
+							<WorkoutNextButton last={last} onPress={complete} />
+							<AppText variant="meta" muted>
+								Sessão demonstrativa · relógio e cargas ilustrativos.
+							</AppText>
+						</View>
+					}
+				/>
+			</SafeAreaView>
 		</View>
 	);
 }

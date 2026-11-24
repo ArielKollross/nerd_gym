@@ -5,7 +5,9 @@ import { WorkoutEntryScreen } from "@/screens/workout-entry";
 export default function WorkoutEntry() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const { workouts } = useWorkouts();
-	const workout = workouts.find((routine) => String(routine.id) === id);
+	const workout = workouts.find(
+		(routine) => String(routine.id) === id && routine.exercises.length > 0,
+	);
 	if (!workout) return <Redirect href="/" />;
 	return (
 		<WorkoutEntryScreen
