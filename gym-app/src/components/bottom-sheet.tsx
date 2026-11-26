@@ -27,6 +27,9 @@ export function BottomSheet({
 }) {
 	const theme = useTheme();
 	const insets = useSafeAreaInsets();
+	// The Android modal already handles system bars and resizes for the keyboard.
+	const bottomPadding =
+		Platform.OS === "android" ? 16 : Math.max(insets.bottom, 16);
 	return (
 		<Modal
 			visible={visible}
@@ -35,7 +38,7 @@ export function BottomSheet({
 			onRequestClose={onClose}
 		>
 			<KeyboardAvoidingView
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				behavior={Platform.OS === "ios" ? "padding" : undefined}
 				style={{
 					flex: 1,
 					justifyContent: "flex-end",
@@ -57,7 +60,7 @@ export function BottomSheet({
 						maxWidth: 720,
 						maxHeight: "100%",
 						backgroundColor: theme.paper,
-						paddingBottom: Math.max(insets.bottom, 16),
+						paddingBottom: bottomPadding,
 						paddingLeft: insets.left,
 						paddingRight: insets.right,
 					}}
