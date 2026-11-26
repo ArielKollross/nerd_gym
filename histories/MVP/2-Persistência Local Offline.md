@@ -27,7 +27,7 @@ Cada ciclo abaixo é obrigatório antes do código funcional correspondente. Con
 - [x] **RED — antes de implementar:** escrever testes para transação interrompida não deixa ficha parcial, migrations repetidas preservam registros e erro de escrita não anuncia sucesso.
 - [x] Executar os testes e confirmar falha pelo comportamento ausente, não por erro de configuração.
 - [x] **GREEN — implementação mínima:** Validar integridade e recuperação com erro explícito e tentativa novamente; não apagar banco silenciosamente. Backup automático, nuvem e exportação ficam futuros.
-- [ ] Verificar encerramento durante escrita e reabertura no aplicativo instalado em modo avião, sem Metro.
+- [x] Verificar encerramento durante escrita e reabertura no aplicativo instalado em modo avião, sem Metro.
 - [x] Executar os mesmos testes e confirmar aprovação.
 - [x] **REFACTOR:** melhorar estrutura mantendo testes verdes; executar regressões relacionadas.
 
@@ -67,3 +67,10 @@ Funcionalidade: Persistência Local Offline
 1. Com um APK normal instalado, crie uma ficha e encerre o app. Em modo avião, abra o app, consulte e edite a ficha. Encerre e reabra novamente para conferir a edição.
 2. Gere um APK de teste com `EXPO_PUBLIC_RUN_SQLITE_TESTS=1` no ambiente da etapa que empacota o JavaScript. Use um dispositivo de teste. Na primeira abertura, o relatório deve exibir “Banco de teste vazio”.
 3. Toque em “Pausar edição antes do commit”. Quando a tela indicar que a transação está pausada, encerre pelo ADB com `adb shell am force-stop <pacote>`. Reabra em modo avião e confirme que a tela volta a exibir “Ficha original íntegra”.
+
+
+## Validação no Galaxy A54
+
+- O APK de produção local iniciou em modo avião, sem Metro. A ficha criada no tema claro reapareceu após encerrar e abrir o app, foi editada no tema escuro e reapareceu com o nome atualizado após nova abertura. A validação via ADB usou os rótulos de acessibilidade dos campos e controles, o teclado para editar o nome e o botão Voltar do Android.
+- No APK de integração, os cenários SQLite passaram. O app foi encerrado pelo ADB com a edição pausada antes do commit. Ao reabrir em modo avião, a ficha original e o vínculo com o exercício permaneceram íntegros.
+- A conectividade do dispositivo foi restaurada e o APK normal reinstalado.
