@@ -22,6 +22,9 @@ There is no root-level build or test command. `UI_example_figma/` has its own sc
 
 ## Coding and Documentation Style
 
+- Use inglês nos nomes de branches e de variáveis no código.
+- Escreva textos da interface e documentação em português do Brasil (PT-BR).
+
 Follow the conventions in the target project's `AGENTS.md` and existing code. Keep product requirements in sync with `SPEC.md` and the relevant history when a change affects documented behavior. Prefer focused changes and descriptive names consistent with nearby files. Do not duplicate app-specific instructions in this root guide.
 
 ## Testing
