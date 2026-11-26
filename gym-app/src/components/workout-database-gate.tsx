@@ -7,11 +7,16 @@ import {
 	type SavedWorkout,
 	type WorkoutRepository,
 } from "@/data/workout-database";
+import type { WorkoutSession } from "@/data/workout-sessions";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "./button";
 import { AppText } from "./typography";
 
-type Ready = { repository: WorkoutRepository; initialWorkouts: SavedWorkout[] };
+type Ready = {
+	repository: WorkoutRepository;
+	initialWorkouts: SavedWorkout[];
+	initialSession: WorkoutSession | null;
+};
 
 let connection:
 	| { db: SQLiteDatabase; repository: WorkoutRepository }
@@ -33,7 +38,11 @@ async function loadWorkouts(): Promise<Ready> {
 			connection = { db, repository: createWorkoutRepository(db) };
 		}
 		const { repository } = connection;
-		return { repository, initialWorkouts: await repository.list() };
+		return {
+			repository,
+			initialWorkouts: await repository.list(),
+			initialSession: await repository.sessions.active(),
+		};
 	} catch (error) {
 		connection = undefined;
 		await db.closeAsync();

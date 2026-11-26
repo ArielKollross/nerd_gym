@@ -10,6 +10,7 @@ import WorkoutEntry from "@/app/workout/[id]";
 import { DemoAccountProvider } from "@/contexts/demo-account";
 import { WorkoutsProvider } from "@/contexts/workouts";
 import type { SavedWorkout, WorkoutDraft } from "@/data/workout-database";
+import type { WorkoutSession } from "@/data/workout-sessions";
 import { HomeScreen } from "@/screens/home";
 import { WorkoutsScreen } from "@/screens/workouts";
 
@@ -27,6 +28,7 @@ jest.mock("expo-router", () => ({
 		return <Text>{`Redirecionar para ${href}`}</Text>;
 	},
 	Link: () => null,
+	usePreventRemove: () => () => {},
 }));
 
 beforeEach(() => {
@@ -53,9 +55,46 @@ async function setup(
 	initial: SavedWorkout[] = [],
 	library: { id: number; name: string }[] = [],
 	view = <WorkoutsScreen />,
+	initialSession?: WorkoutSession,
+	beforeStart?: Promise<void>,
 ) {
 	let nextId = 2;
+	const active = initialSession ?? {
+		id: 1,
+		sheetId: 1,
+		workout: initial[0],
+		sets: [],
+		skipped: [],
+		status: "open" as const,
+		startedAt: Date.now(),
+		restUntil: null,
+		endedAt: null,
+		durationSeconds: null,
+		volume: null,
+	};
+	const sessions = {
+		start: jest.fn(async () => {
+			await beforeStart;
+			return active;
+		}),
+		cancel: jest.fn(async () => ({ ...active, status: "cancelled" as const })),
+		complete: jest.fn(
+			async (_id: number, _input: unknown, _now: number) => active,
+		),
+		suggestWeight: jest.fn(async () => null),
+		active: jest.fn(async () => null),
+		history: jest.fn(async () => []),
+		skipRest: jest.fn(async () => active),
+		skipExercise: jest.fn(async () => active),
+		finish: jest.fn(async () => ({
+			...active,
+			status: "completed" as const,
+			durationSeconds: 30,
+			volume: 500,
+		})),
+	};
 	const repository = {
+		sessions,
 		list: jest.fn(async () => initial),
 		listExercises: jest.fn(async () => library),
 		renameExercise: jest.fn(async (_id: number, _name: string) => {}),
@@ -74,7 +113,11 @@ async function setup(
 		),
 	};
 	const content = (
-		<WorkoutsProvider repository={repository} initialWorkouts={initial}>
+		<WorkoutsProvider
+			repository={repository}
+			initialWorkouts={initial}
+			initialSession={initialSession}
+		>
 			{view}
 		</WorkoutsProvider>
 	);
@@ -354,8 +397,12 @@ test.each([true, false])(
 		jest.mocked(useLocalSearchParams).mockReturnValue({ id: "1" });
 		jest.mocked(router.canGoBack).mockReturnValue(canGoBack);
 		await setup([existing], [], <WorkoutEntry />);
-		expect(screen.getByText("Remada")).toBeOnTheScreen();
+		await screen.findByText("Remada");
 		await press("Fechar treino");
+		expect(router.back).not.toHaveBeenCalled();
+		await press("Continuar treino");
+		await press("Fechar treino");
+		await press("Cancelar sessão");
 		if (canGoBack) {
 			expect(router.back).toHaveBeenCalledTimes(1);
 			expect(router.replace).not.toHaveBeenCalled();
@@ -373,6 +420,91 @@ test("abre treino com muitas séries sem montar todas as linhas de uma vez", asy
 		exercises: [{ ...existing.exercises[0], sets: 250 }],
 	};
 	await setup([workout], [], <WorkoutEntry />);
-	expect(screen.getByText("Série 1 · Concluída")).toBeOnTheScreen();
+	expect(await screen.findByText("Série 1 · Pendente")).toBeOnTheScreen();
 	expect(screen.queryByText("Série 250 · Pendente")).toBeNull();
+});
+
+test("envia os números digitados ao concluir uma série", async () => {
+	jest.mocked(useLocalSearchParams).mockReturnValue({ id: "1" });
+	const repository = await setup([existing], [], <WorkoutEntry />);
+	const weight = await screen.findByLabelText("Carga (kg)");
+	expect(weight).toHaveDisplayValue("20");
+	await fireEvent.changeText(weight, "50,5");
+	await fireEvent.changeText(
+		screen.getByLabelText("Repetições realizadas"),
+		"10",
+	);
+	await press("Concluir série");
+	expect(repository.sessions.complete).toHaveBeenCalledWith(
+		1,
+		{ position: 0, number: 1, weight: 50.5, reps: 10 },
+		expect.any(Number),
+	);
+});
+
+test("mantém carga e repetições para nova tentativa após erro ao gravar", async () => {
+	jest.mocked(useLocalSearchParams).mockReturnValue({ id: "1" });
+	const repository = await setup([existing], [], <WorkoutEntry />);
+	repository.sessions.complete.mockRejectedValueOnce(
+		new Error("Falha ao salvar"),
+	);
+	await fireEvent.changeText(await screen.findByLabelText("Carga (kg)"), "51");
+	await fireEvent.changeText(
+		screen.getByLabelText("Repetições realizadas"),
+		"8",
+	);
+	await press("Concluir série");
+	await screen.findByText("Falha ao salvar");
+	expect(screen.getByLabelText("Carga (kg)")).toHaveDisplayValue("51");
+	expect(screen.getByLabelText("Repetições realizadas")).toHaveDisplayValue(
+		"8",
+	);
+	await press("Concluir série");
+	expect(repository.sessions.complete).toHaveBeenCalledTimes(2);
+});
+
+test("mantém o resumo de uma sessão retomada de ficha excluída", async () => {
+	jest.mocked(useLocalSearchParams).mockReturnValue({ id: "1" });
+	await setup([], [], <WorkoutEntry />, {
+		id: 1,
+		sheetId: 1,
+		workout: existing,
+		startedAt: Date.now(),
+		status: "open",
+		restUntil: null,
+		endedAt: null,
+		durationSeconds: null,
+		volume: null,
+		skipped: [0],
+		sets: [
+			{
+				position: 0,
+				exerciseId: 1,
+				number: 1,
+				weight: 50,
+				reps: 10,
+				volume: 500,
+				completedAt: Date.now(),
+			},
+		],
+	});
+	await screen.findByText("Resumo do treino");
+	await press("Finalizar treino");
+	await screen.findByText("Treino salvo no histórico.");
+	expect(screen.queryByText("Redirecionar para /")).toBeNull();
+});
+
+test("bloqueia Voltar enquanto a criação da sessão aguarda o SQLite", async () => {
+	jest.mocked(useLocalSearchParams).mockReturnValue({ id: "1" });
+	let allowStart = () => {};
+	const pending = new Promise<void>((resolve) => {
+		allowStart = resolve;
+	});
+	await setup([existing], [], <WorkoutEntry />, undefined, pending);
+	expect(screen.getByRole("button", { name: "Voltar" })).toBeDisabled();
+	await press("Voltar");
+	expect(router.back).not.toHaveBeenCalled();
+	expect(router.replace).not.toHaveBeenCalled();
+	allowStart();
+	await screen.findByLabelText("Carga (kg)");
 });

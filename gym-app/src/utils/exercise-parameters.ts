@@ -38,21 +38,23 @@ export type ExerciseParameterInputs = ReturnType<
 	typeof exerciseParameterInputs
 >;
 
+export function parseWeight(input: string): number | null {
+	const weight = input.trim();
+	if (!weight) return null;
+	return /^(?:\d+(?:[.,]\d+)?|[.,]\d+)(?:e[+-]?\d+)?$/i.test(weight)
+		? Number(weight.replace(",", "."))
+		: Number.NaN;
+}
+
 export function parseExerciseParameters(
 	inputs: ExerciseParameterInputs,
 ): ExerciseParameters {
 	const integer = (value: string) =>
 		/^\d+$/.test(value.trim()) ? Number(value) : Number.NaN;
-	const weight = inputs.currentWeight.trim();
 	return {
 		sets: integer(inputs.sets),
 		reps: inputs.reps.trim(),
 		restSeconds: integer(inputs.restSeconds),
-		currentWeight:
-			weight === ""
-				? null
-				: /^(?:\d+(?:[.,]\d+)?|[.,]\d+)(?:e[+-]?\d+)?$/i.test(weight)
-					? Number(weight.replace(",", "."))
-					: Number.NaN,
+		currentWeight: parseWeight(inputs.currentWeight),
 	};
 }

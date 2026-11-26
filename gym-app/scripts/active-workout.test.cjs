@@ -11,30 +11,19 @@ const result = ts.transpileModule(source, {
 const loaded = { exports: {} };
 new Function("exports", result.outputText)(loaded.exports);
 
-test("avançar percorre a rotina e mantém o último exercício em 100%", () => {
-	const { getWorkoutStep, completeWorkoutExercise } = loaded.exports;
-	assert.equal(typeof getWorkoutStep, "function");
-	let completed = 0;
-	for (const [current, progress] of [
-		[0, 0],
-		[1, 25],
-		[2, 50],
-		[3, 75],
-		[3, 100],
-		[3, 100],
-	]) {
-		assert.deepEqual(getWorkoutStep(completed, 4), { current, progress });
-		completed = completeWorkoutExercise(completed, 4);
-	}
+test("calcula o descanso pelo prazo, inclusive no retorno do background", () => {
+	const { remainingRest } = loaded.exports;
+	assert.equal(remainingRest({ restUntil: 62000 }, 2000), 60);
+	assert.equal(remainingRest({ restUntil: 62000 }, 42000), 20);
+	assert.equal(remainingRest({ restUntil: 62000 }, 62000), 0);
+	assert.equal(remainingRest({ restUntil: null }, 42000), 0);
 });
 
-test("rotina única finaliza sem sair do exercício e uma nova sessão começa em zero", () => {
-	const { getWorkoutStep, completeWorkoutExercise } = loaded.exports;
-	assert.equal(typeof getWorkoutStep, "function");
-	assert.deepEqual(getWorkoutStep(0, 1), { current: 0, progress: 0 });
-	const completed = completeWorkoutExercise(0, 1);
-	assert.deepEqual(getWorkoutStep(completed, 1), { current: 0, progress: 100 });
-	assert.equal(completeWorkoutExercise(completed, 1), 1);
-	assert.deepEqual(getWorkoutStep(0, 3), { current: 0, progress: 0 });
-	assert.deepEqual(getWorkoutStep(1, 3), { current: 1, progress: 33 });
+test("calcula o volume com o realizado e recusa valores inválidos", () => {
+	const { setVolume } = loaded.exports;
+	assert.equal(setVolume(50, 10), 500);
+	assert.equal(setVolume(50.5, 10), 505);
+	assert.equal(setVolume(50, 1.5), null);
+	assert.equal(setVolume(0, 10), null);
+	assert.equal(setVolume(Infinity, 10), null);
 });

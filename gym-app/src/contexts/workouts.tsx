@@ -1,12 +1,23 @@
-import { createContext, type ReactNode, useContext, useState } from "react";
+import {
+	createContext,
+	type ReactNode,
+	useCallback,
+	useContext,
+	useState,
+} from "react";
 import type {
 	SavedWorkout,
 	WorkoutDraft,
 	WorkoutRepository,
 } from "@/data/workout-database";
 
+import type { WorkoutSession } from "@/data/workout-sessions";
+
 const WorkoutsContext = createContext<{
 	workouts: SavedWorkout[];
+	sessions: WorkoutRepository["sessions"];
+	activeSession: WorkoutSession | null;
+	updateActiveSession: (session: WorkoutSession) => void;
 	saveWorkout: (draft: WorkoutDraft, id?: number) => Promise<void>;
 	removeWorkout: (id: number) => Promise<void>;
 	library: Pick<WorkoutRepository, "listExercises" | "renameExercise">;
@@ -16,12 +27,25 @@ export function WorkoutsProvider({
 	children,
 	repository,
 	initialWorkouts,
+	initialSession = null,
 }: {
 	children: ReactNode;
 	repository: WorkoutRepository;
 	initialWorkouts: SavedWorkout[];
+	initialSession?: WorkoutSession | null;
 }) {
 	const [workouts, setWorkouts] = useState(initialWorkouts);
+	const [activeSession, setActiveSession] = useState(initialSession);
+
+	const updateActiveSession = useCallback((session: WorkoutSession) => {
+		setActiveSession((previous) =>
+			session.status === "open"
+				? session
+				: previous?.id === session.id
+					? null
+					: previous,
+		);
+	}, []);
 
 	async function saveWorkout(draft: WorkoutDraft, id?: number) {
 		const saved = await repository.save(draft, id);
@@ -53,6 +77,9 @@ export function WorkoutsProvider({
 		<WorkoutsContext.Provider
 			value={{
 				workouts,
+				sessions: repository.sessions,
+				activeSession,
+				updateActiveSession,
 				saveWorkout,
 				removeWorkout,
 				library: { listExercises: repository.listExercises, renameExercise },

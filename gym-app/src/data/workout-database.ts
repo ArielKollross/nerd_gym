@@ -1,5 +1,6 @@
 import type { Exercise, Workout } from "@/types/workout";
 import { validExerciseParameters } from "@/utils/exercise-parameters";
+import { createSessionRepository } from "./workout-sessions";
 
 export type LibraryExercise = { id: number; name: string };
 
@@ -39,6 +40,31 @@ const migrations = [
 		UNIQUE (sheet_id, position)
 	);`,
 	"CREATE INDEX sheet_exercises_by_exercise ON sheet_exercises(exercise_id);",
+	`CREATE TABLE workout_sessions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		sheet_id INTEGER NOT NULL,
+		snapshot TEXT NOT NULL,
+		started_at INTEGER NOT NULL,
+		rest_until INTEGER,
+		skipped TEXT NOT NULL DEFAULT '[]',
+		ended_at INTEGER,
+		duration_seconds INTEGER,
+		volume REAL,
+		status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open', 'completed', 'cancelled'))
+	);
+	CREATE UNIQUE INDEX workout_sessions_one_open ON workout_sessions(status) WHERE status = 'open';
+	CREATE TABLE workout_sets (
+		session_id INTEGER NOT NULL REFERENCES workout_sessions(id),
+		position INTEGER NOT NULL,
+		exercise_id INTEGER NOT NULL,
+		number INTEGER NOT NULL CHECK(number > 0),
+		weight REAL NOT NULL CHECK(weight > 0),
+		reps INTEGER NOT NULL CHECK(reps > 0),
+		volume REAL NOT NULL CHECK(volume > 0),
+		completed_at INTEGER NOT NULL,
+		PRIMARY KEY(session_id, position, number)
+	);
+	CREATE INDEX workout_sets_latest ON workout_sets(exercise_id, completed_at DESC);`,
 ];
 
 async function transaction<Result>(
@@ -99,10 +125,8 @@ export function createWorkoutRepository(db: WorkoutDatabase) {
 		return result;
 	}
 
-	return {
-		list: () =>
-			enqueue(async () => {
-				const rows = await db.getAllAsync<WorkoutRow>(`
+	async function listWorkouts() {
+		const rows = await db.getAllAsync<WorkoutRow>(`
 				SELECT sheets.id AS sheetId, sheets.name AS sheetName, exercises.id, exercises.name,
 					links.sets, links.reps, links.rest_seconds AS restSeconds,
 					links.current_weight AS currentWeight
@@ -111,17 +135,26 @@ export function createWorkoutRepository(db: WorkoutDatabase) {
 				LEFT JOIN exercises ON exercises.id = links.exercise_id
 				ORDER BY sheets.id, links.position
 			`);
-				const workouts = new Map<number, SavedWorkout>();
-				for (const { sheetId, sheetName, ...exercise } of rows) {
-					let workout = workouts.get(sheetId);
-					if (!workout) {
-						workout = { id: sheetId, name: sheetName, exercises: [] };
-						workouts.set(sheetId, workout);
-					}
-					if (exercise.id !== null) workout.exercises.push(exercise);
-				}
-				return [...workouts.values()];
-			}),
+		const workouts = new Map<number, SavedWorkout>();
+		for (const { sheetId, sheetName, ...exercise } of rows) {
+			let workout = workouts.get(sheetId);
+			if (!workout) {
+				workout = { id: sheetId, name: sheetName, exercises: [] };
+				workouts.set(sheetId, workout);
+			}
+			if (exercise.id !== null) workout.exercises.push(exercise);
+		}
+		return [...workouts.values()];
+	}
+
+	return {
+		list: () => enqueue(listWorkouts),
+		sessions: createSessionRepository(
+			db,
+			(operation) => enqueue(() => transaction(db, operation)),
+			listWorkouts,
+			enqueue,
+		),
 		listExercises: () =>
 			enqueue(() =>
 				db.getAllAsync<LibraryExercise>(
