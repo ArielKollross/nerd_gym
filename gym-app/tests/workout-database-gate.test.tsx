@@ -11,7 +11,9 @@ test("reabre o mesmo banco quando a primeira leitura falha", async () => {
 	const closeFailedConnection = jest.fn(async () => {});
 	const migration = {
 		execAsync: jest.fn(async () => {}),
-		getFirstAsync: jest.fn(async () => ({ user_version: 2 })),
+		getFirstAsync: jest.fn(async (sql: string) =>
+			sql === "PRAGMA user_version" ? { user_version: 3 } : null,
+		),
 	};
 	const openDatabase = jest.mocked(openDatabaseAsync);
 	openDatabase

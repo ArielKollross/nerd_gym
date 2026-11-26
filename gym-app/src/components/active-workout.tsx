@@ -38,7 +38,7 @@ export function ActiveWorkoutHeader({
 					</AppText>
 				</View>
 				<AppText
-					accessibilityLabel={`Tempo demonstrativo: ${time}`}
+					accessibilityLabel={`Tempo de treino: ${time}`}
 					style={{ color: theme.lime, fontVariant: ["tabular-nums"] }}
 				>
 					{time}

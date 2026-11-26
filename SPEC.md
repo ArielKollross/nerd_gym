@@ -32,9 +32,10 @@ Quando eu for para academia treinar, quero poder iniciar um treino que eu montei
 - como usuário, quero criar categorias para meu treinos (braços, costas, pernas, etc)
 - como usuário, quero poder iniciar um treino estabelecido na pela ficha de treino.
   - Quero poder visualizar a sequência do meu treino
-  - Quero poder marcar um repetição como concluída
-  - Quero poder visualizar o tempo de descanço entre uma repetição e outra
-  - Quero poder adicionar a quantidade de peso utilizada na execução do exercício
+  - Quero registrar cada série com a carga em kg e as repetições realizadas, usando como sugestão a última carga registrada para o exercício ou a carga planejada.
+  - Quero ver o descanso entre séries e receber um aviso local ao final, quando permitido pelo sistema.
+  - Quero retomar a sessão com a mesma prescrição e com o descanso recalculado pelo horário previsto, mesmo após fechar o app.
+  - Quero poder pular descanso ou exercício, cancelar a sessão ou finalizar e ver o resumo com duração e volume. O histórico de treinos realizados conta apenas sessões finalizadas com pelo menos uma série concluída.
 - como usuario, quero acompanhar o meu progresso de exercícios.
 
 ### Brainstorm

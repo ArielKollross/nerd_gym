@@ -16,7 +16,7 @@ import type { Workout } from "@/types/workout";
 export function WorkoutsScreen() {
 	const { status } = useDemoAccount();
 	const theme = useTheme();
-	const { workouts, saveWorkout, removeWorkout } = useWorkouts();
+	const { workouts, saveWorkout, removeWorkout, activeSession } = useWorkouts();
 	const { create } = useLocalSearchParams<{ create?: string }>();
 	const [modal, setModal] = useState<
 		{ kind: "create" } | { kind: "edit" | "delete"; workout: Workout } | null
@@ -67,6 +67,18 @@ export function WorkoutsScreen() {
 							? "Escolha uma rotina e comece a se mover."
 							: "Crie sua primeira ficha de treino."}
 					</AppText>
+					{activeSession && (
+						<Button
+							label={`Retomar treino · ${activeSession.workout.name}`}
+							fullWidth
+							onPress={() =>
+								router.push({
+									pathname: "/workout/[id]",
+									params: { id: activeSession.sheetId },
+								})
+							}
+						/>
+					)}
 					<View className="flex-row flex-wrap gap-3">
 						{workouts.map((workout, index) => (
 							<View

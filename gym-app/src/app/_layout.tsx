@@ -8,6 +8,7 @@ import { Platform } from "react-native";
 import { WorkoutDatabaseGate } from "@/components/workout-database-gate";
 import { DemoAccountProvider } from "@/contexts/demo-account";
 import { WorkoutsProvider } from "@/contexts/workouts";
+import { initializeWorkoutNotifications } from "@/utils/workout-notifications";
 
 if (Platform.OS !== "web") {
 	void SplashScreen.preventAutoHideAsync();
@@ -32,6 +33,10 @@ export default function RootLayout() {
 			void SplashScreen.hideAsync();
 		}
 	}, [fontsLoaded, fontError]);
+
+	useEffect(() => {
+		if (!IntegrationRunner) initializeWorkoutNotifications();
+	}, []);
 
 	if (!fontsLoaded && !fontError) {
 		return null;

@@ -134,7 +134,7 @@ export const sqliteCases = {
 	"migra um banco vazio": scenario(async (db) => {
 		await database.migrateWorkouts(db);
 		equal(await database.createWorkoutRepository(db).list(), []);
-		equal(await db.getFirstAsync("PRAGMA user_version"), { user_version: 2 });
+		equal(await db.getFirstAsync("PRAGMA user_version"), { user_version: 3 });
 	}),
 	"atualiza um banco existente e pode repetir a migração": scenario(
 		async (db) => {
@@ -150,7 +150,7 @@ export const sqliteCases = {
 		`);
 			for (let attempt = 0; attempt < 2; attempt++)
 				await database.migrateWorkouts(db);
-			equal(await db.getFirstAsync("PRAGMA user_version"), { user_version: 2 });
+			equal(await db.getFirstAsync("PRAGMA user_version"), { user_version: 3 });
 			const [saved] = await database.createWorkoutRepository(db).list();
 			equal(saved.id, 7);
 			equal(saved.exercises[0].id, 12);
