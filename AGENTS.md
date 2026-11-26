@@ -33,4 +33,6 @@ No shared test framework or coverage requirement is configured at the repository
 
 ## Commits and Pull Requests
 
+Use a skill [create-pull-request](skills/create-pull-request/SKILL.md) para preparar ou abrir PRs neste repositório.
+
 Recent root commits use conventional prefixes such as `docs:` and `chore:`. Use a short, scoped subject (for example, `docs: clarify active app location`). Describe the purpose and affected project in each pull request, link related issues or specs, and include relevant screenshots for UI changes. Commit app changes within the app repository when applicable, then update the parent repository's submodule reference only if that project is still in use.
