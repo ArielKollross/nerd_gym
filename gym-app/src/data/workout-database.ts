@@ -51,7 +51,8 @@ async function transaction<Result>(
 		await db.execAsync("COMMIT");
 		return result;
 	} catch (error) {
-		await db.execAsync("ROLLBACK");
+		// O SQLite pode já ter revertido a transação ao rejeitar a escrita.
+		await db.execAsync("ROLLBACK").catch(() => undefined);
 		throw error;
 	}
 }

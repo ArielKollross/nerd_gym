@@ -13,10 +13,9 @@ if (Platform.OS !== "web") {
 	void SplashScreen.preventAutoHideAsync();
 }
 
+// O APK de integração usa um banco descartável e permite testar sem Metro.
 const IntegrationRunner =
-	__DEV__ &&
-	Platform.OS === "android" &&
-	process.env.EXPO_PUBLIC_RUN_SQLITE_TESTS === "1"
+	Platform.OS === "android" && process.env.EXPO_PUBLIC_RUN_SQLITE_TESTS === "1"
 		? (
 				require("../../tests/android-sqlite-runner") as typeof import("../../tests/android-sqlite-runner")
 			).AndroidSQLiteRunner

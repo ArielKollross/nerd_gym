@@ -1,3 +1,4 @@
+import type { SQLiteDatabase } from "expo-sqlite";
 import { type ReactNode, useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import {
@@ -10,23 +11,35 @@ import { useTheme } from "@/hooks/use-theme";
 import { Button } from "./button";
 import { AppText } from "./typography";
 
-async function openRepository() {
-	const { openDatabaseAsync } = await import("expo-sqlite");
-	const db = await openDatabaseAsync("workout-sheets.db", {
-		useNewConnection: true,
-	});
+type Ready = { repository: WorkoutRepository; initialWorkouts: SavedWorkout[] };
+
+let connection:
+	| { db: SQLiteDatabase; repository: WorkoutRepository }
+	| undefined;
+let opening: Promise<Ready> | undefined;
+
+async function loadWorkouts(): Promise<Ready> {
+	// Carrega o módulo SQLite somente no cliente.
+	const { openDatabaseAsync } =
+		require("expo-sqlite") as typeof import("expo-sqlite");
+	const db =
+		connection?.db ??
+		(await openDatabaseAsync("workout-sheets.db", {
+			useNewConnection: true,
+		}));
 	try {
-		await migrateWorkouts(db);
-		return createWorkoutRepository(db);
+		if (!connection) {
+			await migrateWorkouts(db);
+			connection = { db, repository: createWorkoutRepository(db) };
+		}
+		const { repository } = connection;
+		return { repository, initialWorkouts: await repository.list() };
 	} catch (error) {
+		connection = undefined;
 		await db.closeAsync();
 		throw error;
 	}
 }
-
-let opening: Promise<WorkoutRepository> | undefined;
-
-type Ready = { repository: WorkoutRepository; initialWorkouts: SavedWorkout[] };
 
 export function WorkoutDatabaseGate({
 	children,
@@ -39,23 +52,17 @@ export function WorkoutDatabaseGate({
 	useEffect(() => {
 		if (state !== "loading") return;
 		let active = true;
-		opening ??= openRepository().catch((error) => {
+		opening ??= loadWorkouts().finally(() => {
 			opening = undefined;
-			throw error;
 		});
-		void opening
-			.then(async (repository) => ({
-				repository,
-				initialWorkouts: await repository.list(),
-			}))
-			.then(
-				(ready) => {
-					if (active) setState(ready);
-				},
-				() => {
-					if (active) setState("error");
-				},
-			);
+		void opening.then(
+			(ready) => {
+				if (active) setState(ready);
+			},
+			() => {
+				if (active) setState("error");
+			},
+		);
 		return () => {
 			active = false;
 		};

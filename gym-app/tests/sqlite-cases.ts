@@ -180,6 +180,41 @@ export const sqliteCases = {
 			]);
 		}
 	}),
+	"preserva a ficha e informa a falha quando o SQLite aborta a transação":
+		scenario(async (db) => {
+			await database.migrateWorkouts(db);
+			const repository = database.createWorkoutRepository(db);
+			const original = await repository.save(draft);
+			await db.execAsync(`
+				CREATE TEMP TRIGGER interrupt_write BEFORE INSERT ON sheet_exercises
+				BEGIN
+					SELECT RAISE(ROLLBACK, 'Escrita interrompida');
+				END;
+			`);
+			for (const id of [undefined, original.id]) {
+				let failure: unknown;
+				try {
+					await repository.save({ ...draft, name: "Alterado" }, id);
+				} catch (error) {
+					failure = error;
+				}
+				equal(String(failure).includes("Escrita interrompida"), true);
+				equal(await repository.list(), [original]);
+				equal(await repository.listExercises(), [
+					{ id: original.exercises[0].id, name: "Remada" },
+				]);
+			}
+			await db.execAsync("DROP TRIGGER interrupt_write");
+			await database.migrateWorkouts(db);
+			await database.migrateWorkouts(db);
+			equal(await repository.list(), [original]);
+			const edited = await repository.save(
+				{ ...original, name: "Editado" },
+				original.id,
+			);
+			equal(await repository.list(), [edited]);
+		}),
+
 	"exclui só a ficha e os vínculos": scenario(async (db) => {
 		await database.migrateWorkouts(db);
 		const repository = database.createWorkoutRepository(db);
