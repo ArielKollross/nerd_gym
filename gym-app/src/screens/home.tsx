@@ -12,7 +12,7 @@ import { AppText, Duration, SectionHeading } from "@/components/typography";
 import { ExerciseRow } from "@/components/workout-card";
 import { Images } from "@/constants/assets";
 import { useDemoAccount } from "@/contexts/demo-account";
-import { nextDemoWorkout } from "@/data/demo-workouts";
+import { useWorkouts } from "@/contexts/workouts";
 import { useTheme } from "@/hooks/use-theme";
 
 function HomeHero() {
@@ -97,9 +97,12 @@ function HomeHero() {
 export function HomeScreen() {
 	const { status } = useDemoAccount();
 	const theme = useTheme();
-	const previewExercises = nextDemoWorkout.exercises.slice(0, 3);
+	const {
+		workouts: [nextWorkout],
+	} = useWorkouts();
+	const previewExercises = nextWorkout?.exercises.slice(0, 3) ?? [];
 	const remainingExercises =
-		nextDemoWorkout.exercises.length - previewExercises.length;
+		(nextWorkout?.exercises.length ?? 0) - previewExercises.length;
 	return (
 		<SafeAreaView
 			edges={["left", "right"]}
@@ -124,52 +127,75 @@ export function HomeScreen() {
 							backgroundColor: theme.paper,
 						}}
 					>
-						<SectionHeading
-							eyebrow="PRÓXIMO TREINO"
-							title={nextDemoWorkout.name}
-							action={<Duration minutes={nextDemoWorkout.duration} />}
-						/>
-						<View style={{ borderTopWidth: 1, borderTopColor: theme.line }}>
-							{previewExercises.map((exercise, index) => (
-								<ExerciseRow
-									key={exercise.name}
-									{...exercise}
-									order={index + 1}
+						{nextWorkout ? (
+							<>
+								<SectionHeading
+									eyebrow="PRÓXIMO TREINO"
+									title={nextWorkout.name}
 									action={
-										index === previewExercises.length - 1 &&
-										remainingExercises > 0 ? (
-											<View
-												className="rounded-full px-2 py-1"
-												style={{ backgroundColor: theme.surfaceSelected }}
-												accessible
-												accessibilityLabel={`Mais ${remainingExercises} exercício`}
-											>
-												<AppText variant="meta" muted>
-													+{remainingExercises}
-												</AppText>
-											</View>
-										) : undefined
+										nextWorkout.duration == null ? undefined : (
+											<Duration minutes={nextWorkout.duration} />
+										)
 									}
 								/>
-							))}
-						</View>
-						<Button
-							label="Meus treinos"
-							variant="secondary"
-							fullWidth
-							onPress={() => router.push("/workouts")}
-						/>
-						<Button
-							label="Iniciar treino"
-							icon="arrow"
-							fullWidth
-							onPress={() =>
-								router.push({
-									pathname: "/workout/[id]",
-									params: { id: nextDemoWorkout.id },
-								})
-							}
-						/>
+								<View style={{ borderTopWidth: 1, borderTopColor: theme.line }}>
+									{previewExercises.map((exercise, index) => (
+										<ExerciseRow
+											key={exercise.id}
+											{...exercise}
+											order={index + 1}
+											action={
+												index === previewExercises.length - 1 &&
+												remainingExercises > 0 ? (
+													<View
+														className="rounded-full px-2 py-1"
+														style={{ backgroundColor: theme.surfaceSelected }}
+														accessible
+														accessibilityLabel={`Mais ${remainingExercises} exercício`}
+													>
+														<AppText variant="meta" muted>
+															+{remainingExercises}
+														</AppText>
+													</View>
+												) : undefined
+											}
+										/>
+									))}
+								</View>
+								<Button
+									label="Meus treinos"
+									variant="secondary"
+									fullWidth
+									onPress={() => router.push("/workouts")}
+								/>
+								<Button
+									label="Iniciar treino"
+									icon="arrow"
+									fullWidth
+									onPress={() =>
+										router.push({
+											pathname: "/workout/[id]",
+											params: { id: nextWorkout.id },
+										})
+									}
+								/>
+							</>
+						) : (
+							<>
+								<SectionHeading title="Nenhuma ficha de treino" />
+								<Button
+									label="Criar primeira ficha"
+									icon="plus"
+									fullWidth
+									onPress={() =>
+										router.push({
+											pathname: "/workouts",
+											params: { create: "1" },
+										})
+									}
+								/>
+							</>
+						)}
 					</View>
 					<View className="px-5 pb-7">
 						{status !== "premium" ? <AdBanner variant="home" /> : null}

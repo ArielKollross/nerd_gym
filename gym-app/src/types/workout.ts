@@ -1,4 +1,11 @@
-export type Exercise = { name: string; sets: number; reps: string };
+export type Exercise = {
+	id?: number;
+	name: string;
+	sets: number;
+	reps: string;
+	restSeconds?: number;
+	currentWeight?: number | null;
+};
 export type Workout = {
 	id: number;
 	name: string;

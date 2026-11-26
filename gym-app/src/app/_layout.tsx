@@ -5,12 +5,22 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { Platform } from "react-native";
+import { WorkoutDatabaseGate } from "@/components/workout-database-gate";
 import { DemoAccountProvider } from "@/contexts/demo-account";
 import { WorkoutsProvider } from "@/contexts/workouts";
 
 if (Platform.OS !== "web") {
 	void SplashScreen.preventAutoHideAsync();
 }
+
+const IntegrationRunner =
+	__DEV__ &&
+	Platform.OS === "android" &&
+	process.env.EXPO_PUBLIC_RUN_SQLITE_TESTS === "1"
+		? (
+				require("../../tests/android-sqlite-runner") as typeof import("../../tests/android-sqlite-runner")
+			).AndroidSQLiteRunner
+		: null;
 
 export default function RootLayout() {
 	const [fontsLoaded, fontError] = useFonts({
@@ -28,11 +38,17 @@ export default function RootLayout() {
 		return null;
 	}
 
+	if (IntegrationRunner) return <IntegrationRunner />;
+
 	return (
 		<DemoAccountProvider>
-			<WorkoutsProvider>
-				<Stack screenOptions={{ headerShown: false }} />
-			</WorkoutsProvider>
+			<WorkoutDatabaseGate>
+				{(ready) => (
+					<WorkoutsProvider {...ready}>
+						<Stack screenOptions={{ headerShown: false }} />
+					</WorkoutsProvider>
+				)}
+			</WorkoutDatabaseGate>
 		</DemoAccountProvider>
 	);
 }
